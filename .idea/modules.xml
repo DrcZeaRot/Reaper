@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/AopCollection.iml" filepath="$PROJECT_DIR$/AopCollection.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reaper-annotations/reaper-annotations.iml" filepath="$PROJECT_DIR$/reaper-annotations/reaper-annotations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reaper-plugin/reaper-plugin.iml" filepath="$PROJECT_DIR$/reaper-plugin/reaper-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reaper-runtime/reaper-runtime.iml" filepath="$PROJECT_DIR$/reaper-runtime/reaper-runtime.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reaper-sample/reaper-sample.iml" filepath="$PROJECT_DIR$/reaper-sample/reaper-sample.iml" />
+    </modules>
+  </component>
+</project>
