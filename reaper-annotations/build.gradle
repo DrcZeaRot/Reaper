@@ -1,0 +1,9 @@
+apply plugin: 'java'
+apply plugin: 'nexus'
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+targetCompatibility = JavaVersion.VERSION_1_7
+sourceCompatibility = JavaVersion.VERSION_1_7
