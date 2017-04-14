@@ -13,23 +13,28 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 @Target({METHOD})
 @Retention(CLASS)
 public @interface OnEvent {
-    /**
-     * 事件类型
-     */
-    EventType event() default EventType.ACTION;
-
-    /**
-     * pageName，除了Action事件全部需要
-     */
-    String pageName() default "";
-
-    /**
-     * actionName，DURATION事件不需要
-     */
-    String actionName() default "";
-
-    /**
-     * 起始时间 只有PAGE_DURATION需要
-     */
-    long startTime() default 0;
+//    /**
+//     * 事件类型
+//     */
+//    EventType event() default EventType.ACTION;
+//
+//    /**
+//     * pageName
+//     */
+//    String pageName() default "";
+//
+//    /**
+//     * actionName
+//     */
+//    String actionName() default "";
+//
+//    /**
+//     * action index
+//     */
+//    int index() default 0;
+//
+//    /**
+//     * 起始时间 只有PAGE_DURATION需要
+//     */
+//    long startTime() default 0;
 }

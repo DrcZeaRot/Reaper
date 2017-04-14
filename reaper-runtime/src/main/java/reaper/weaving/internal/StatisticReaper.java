@@ -4,17 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 
-import reaper.weaving.internal.handler.StatisticProvider;
+import reaper.weaving.internal.handler.statistics.StatisticEvent;
 import reaper.weaving.internal.handler.statistics.StatisticHandler;
-import reaper.weaving.internal.handler.statistics.talkingdata.TDStatisticEvent;
 import reaper.weaving.statistics.EventType;
-import reaper.weaving.statistics.OnEvent;
 import reaper.weaving.statistics.PageDuration;
 
 /**
@@ -23,90 +21,113 @@ import reaper.weaving.statistics.PageDuration;
 @Aspect
 public class StatisticReaper {
 
-    private StatisticHandler<TDStatisticEvent> handler = StatisticProvider.defaultHander();
+    private final String POINT_CUT_ONEVENT =
+            "execution(" +
+                    "@reaper.weaving.statistics.OnEvent * *" +
+                    "(android.content.Context,reaper.weaving.internal.handler.statistics.StatisticEvent+,..)" +
+                    ")";
+    private final String POINT_CUT_ONTYPE =
+            "within(@reaper.weaving.statistics.PageDuration *)";
+
+    private StatisticHandler<StatisticEvent> handler = new StatisticHandler(StatisticProvider.getInstance().getStrategy());
+
+    public StatisticReaper() {
+
+    }
 
     private static volatile boolean enabled = true;
 
-    @Pointcut("execution(@reaper.weaving.statistics.OnEvent * *(android.content.Context,..))&& @annotation(onEvent) && args(context,..)")
+    @Pointcut(POINT_CUT_ONEVENT)
     public void withinMethodAnnotated() {
     }
 
-    @Pointcut("within(@reaper.weaving.statistics.PageDuration *)&& @annotation(duration)")
+    @Pointcut(POINT_CUT_ONTYPE)
     public void withinClassAnnotated() {
     }
 
-
-    @Pointcut("execution(protected VOID android.app.Activity+.onCreate(android.os.Bundle)) && target(activity) ")
+    @Pointcut("this(android.app.Activity+) && execution(protected * *.onCreate(android.os.Bundle))")
     public void activityOnCreate() {
     }
 
-    @Pointcut("execution(protected VOID android.app.Activity+.onDestroy()) && target(activity)")
-
+    @Pointcut("this(android.app.Activity+) && execution(protected * *.onDestroy())")
     public void activityOnDestroy() {
     }
 
-    @Pointcut("execution(protected VOID android.support.v4.app.Fragment+.onViewCreated(android.view.View,android.os.Bundle)) && target(fragment)")
+    @Pointcut("this(android.support.v4.app.Fragment+) && execution(protected * *.onViewCreated(android.view.View,android.os.Bundle))")
     public void fragmentOnCreateView() {
     }
 
-    @Pointcut("execution(protected VOID android.support.v4.app.Fragment+.onDestroyView()) && target(fragment)")
+    @Pointcut("this(android.support.v4.app.Fragment+) && execution(protected * *.onDestroyView())")
     public void fragmentOnDestroyView() {
     }
 
-    @Before("withinMethodAnnotated()")
-    public void onEvent(ProceedingJoinPoint joinPoint, OnEvent onEvent, Context context) {
-        if (enabled) {
-            TDStatisticEvent event = new TDStatisticEvent();
-            event.setType(onEvent.event());
-            event.setPageName(onEvent.pageName());
-            event.setActionName(onEvent.actionName());
-            event.setStartTime(onEvent.startTime());
-            handler.onEvent(context, event);
-        }
+
+    @Around("withinMethodAnnotated()")
+    public Object onEvent(ProceedingJoinPoint joinPoint) throws Throwable {
+        markEvent(joinPoint);
+        return joinPoint.proceed();
     }
 
-    @After("withinClassAnnotated() && activityOnCreate()")
-    public void onActivityCreated(ProceedingJoinPoint joinPoint, PageDuration duration, Activity activity) {
-        if (enabled) {
-            TDStatisticEvent event = new TDStatisticEvent();
-            event.setPageName(duration.value());
-            event.setType(EventType.PAGE_START);
-            handler.onEvent(activity, event);
-        }
+    //    @Around("withinClassAnnotated(duration) && activityOnCreate()")
+    @Around("withinClassAnnotated() && activityOnCreate()")
+    public Object onActivityCreated(ProceedingJoinPoint joinPoint) throws Throwable {
+        Object result = joinPoint.proceed();
+        markDuration(joinPoint, EventType.PAGE_START);
+        return result;
     }
 
-    @Before("withinClassAnnotated() && activityOnDestroy()")
-    public void onActivityDestroy(ProceedingJoinPoint joinPoint, PageDuration duration, Activity activity) {
-        if (enabled) {
-            TDStatisticEvent event = new TDStatisticEvent();
-            event.setPageName(duration.value());
-            event.setType(EventType.PAGE_END);
-            handler.onEvent(activity, event);
-        }
+    //    @Around("withinClassAnnotated(duration) && activityOnDestroy()")
+    @Around("withinClassAnnotated() && activityOnDestroy()")
+    public Object onActivityDestroy(ProceedingJoinPoint joinPoint) throws Throwable {
+        markDuration(joinPoint, EventType.PAGE_END);
+        return joinPoint.proceed();
     }
 
-    @After("withinClassAnnotated() && fragmentOnCreateView()")
-    public void onFragmentCreateView(ProceedingJoinPoint joinPoint, PageDuration duration, Fragment fragment) {
-        if (enabled) {
-            TDStatisticEvent event = new TDStatisticEvent();
-            event.setPageName(duration.value());
-            event.setType(EventType.PAGE_START);
-            handler.onEvent(fragment.getContext(), event);
-        }
+    //    @Around("withinClassAnnotated(duration) && fragmentOnCreateView()")
+    @Around("withinClassAnnotated() && fragmentOnCreateView()")
+    public Object onFragmentCreateView(ProceedingJoinPoint joinPoint) throws Throwable {
+        Object result = joinPoint.proceed();
+        markDuration(joinPoint, EventType.PAGE_START);
+        return result;
     }
 
-    @Before("withinClassAnnotated() && fragmentOnDestroyView()")
-    public void onFragmentDestroyView(ProceedingJoinPoint joinPoint, PageDuration duration, Fragment fragment) {
-        if (enabled) {
-            TDStatisticEvent event = new TDStatisticEvent();
-            event.setPageName(duration.value());
-            event.setType(EventType.PAGE_END);
-            handler.onEvent(fragment.getContext(), event);
-        }
+    //    @Around("withinClassAnnotated(duration) && fragmentOnDestroyView()")
+    @Around("withinClassAnnotated() && fragmentOnDestroyView()")
+    public Object onFragmentDestroyView(ProceedingJoinPoint joinPoint) throws Throwable {
+        markDuration(joinPoint, EventType.PAGE_END);
+        return joinPoint.proceed();
     }
 
     public static void setEnabled(boolean enabled) {
         StatisticReaper.enabled = enabled;
+    }
+
+    private void markEvent(JoinPoint joinPoint) {
+        if (!enabled) return;
+        Object[] args = joinPoint.getArgs();
+        Context context = (Context) args[0];
+        StatisticEvent event = (StatisticEvent) args[1];
+        handler.onEvent(context, event);
+    }
+
+    private void markDuration(JoinPoint joinPoint, EventType eventType) throws IllegalAccessException, InstantiationException {
+        if (!enabled) return;
+        Context context;
+        Object aThis = joinPoint.getThis();
+        if (aThis instanceof Activity) {
+            context = (Activity) aThis;
+        } else if (aThis instanceof Fragment) {
+            context = ((Fragment) aThis).getContext();
+        } else {
+            throw new IllegalStateException("only use @PageDuration on Activity or Fragment ");
+        }
+        Class<?> aClass = aThis.getClass();
+        PageDuration duration = aClass.getAnnotation(PageDuration.class);
+        Class<?> clazz = duration.clazz();
+        StatisticEvent event = (StatisticEvent) clazz.newInstance();
+        event.setPageName(duration.pageName());
+        event.setType(eventType);
+        handler.onEvent(context, event);
     }
 
 

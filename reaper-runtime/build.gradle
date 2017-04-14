@@ -15,7 +15,7 @@ android {
 }
 
 dependencies {
-    compile 'org.aspectj:aspectjrt:1.8.6'
+    compile 'org.aspectj:aspectjrt:1.8.9'
     compile project(':reaper-annotations')
     compile 'com.android.support:support-v4:25.3.0'
     testCompile 'junit:junit:4.12'
@@ -24,15 +24,13 @@ dependencies {
 android.libraryVariants.all { variant ->
     JavaCompile javaCompile = variant.javaCompile
     javaCompile.doLast {
-        String[] args = [
-                "-showWeaveInfo",
-                "-1.7",
-                "-inpath", javaCompile.destinationDir.toString(),
-                "-aspectpath", javaCompile.classpath.asPath,
-                "-d", javaCompile.destinationDir.toString(),
-                "-classpath", javaCompile.classpath.asPath,
-                "-bootclasspath", android.bootClasspath.join(File.pathSeparator)
-        ]
+        String[] args = ["-showWeaveInfo",
+                         "-1.8",
+                         "-inpath", javaCompile.destinationDir.toString(),
+                         "-aspectpath", javaCompile.classpath.asPath,
+                         "-d", javaCompile.destinationDir.toString(),
+                         "-classpath", javaCompile.classpath.asPath,
+                         "-bootclasspath", project.android.bootClasspath.join(File.pathSeparator)]
 
         MessageHandler handler = new MessageHandler(true);
         new Main().run(args, handler)

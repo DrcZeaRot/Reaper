@@ -12,9 +12,17 @@ public enum EventType {
      */
     ACTION,
     /**
+     * 列表Action事件
+     */
+    INDEX_ACTION,
+    /**
      * page+action事件
      */
     PAGE_ACTION,
+    /**
+     * page+列表action事件
+     */
+    PAGE_INDEX_ACTION,
     /**
      * 计时事件
      */
