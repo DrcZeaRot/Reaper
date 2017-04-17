@@ -20,7 +20,7 @@ public class TDStatisticEvent extends StatisticEvent {
     @Override
     public String toString() {
         return "TDStatisticEvent{" +
-                ", pageName=" + pageName +
+                "pageName=" + pageName +
                 ", actionName=" + actionName +
                 ", type=" + type +
                 ", index=" + index +

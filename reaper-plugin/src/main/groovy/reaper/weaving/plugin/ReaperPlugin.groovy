@@ -45,11 +45,6 @@ class ReaperPlugin implements Plugin<Project> {
             } else if (!project.reaper.enabled) {
                 log.debug("Reaper-Statistic is disabled.")
                 return;
-            } else if (!project.reaper.statisticEnable) {
-                //TODO 单独禁用 statistic编织
-
-                /** 事实上好像没法通过gradle来控制单独禁用一个Aspect，那就只能在单独的Aspect类里通过flag开关了*/
-
             }
 
             //================================= 以下是AspectJ配置

@@ -17,6 +17,4 @@ public @interface PageDuration {
      * 必填 页面信息
      */
     String pageName();
-
-    Class<?> clazz();
 }

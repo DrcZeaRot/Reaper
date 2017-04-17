@@ -10,15 +10,4 @@ class ReaperExtension {
     def getEnabled() {
         return enabled;
     }
-
-    def statisticEnable = false;
-
-    def setStatisticEnable(boolean enable) {
-        this.statisticEnable = enable;
-    }
-
-    def getStatisticEnable() {
-        return statisticEnable;
-    }
-
 }

@@ -1,8 +1,11 @@
 package reaper.weaving.internal;
 
+import android.content.Context;
+
 import reaper.weaving.internal.handler.statistics.StatisticEvent;
 import reaper.weaving.internal.handler.statistics.StatisticHandlerStrategy;
 import reaper.weaving.internal.handler.statistics.talkingdata.TDStaticHandlerStrategy;
+import reaper.weaving.internal.handler.statistics.talkingdata.TDStatisticEvent;
 
 /**
  * Created by R on 2017/4/13.
@@ -11,11 +14,12 @@ import reaper.weaving.internal.handler.statistics.talkingdata.TDStaticHandlerStr
 public class StatisticProvider {
 
     private static volatile StatisticProvider INSTANCE;
+    private Context mContext;
 
     private StatisticHandlerStrategy<? extends StatisticEvent> strategy;
+    private Class<? extends StatisticEvent> eventClass;
 
     private StatisticProvider() {
-        setStrategy(new TDStaticHandlerStrategy());
     }
 
     public static StatisticProvider getInstance() {
@@ -32,11 +36,35 @@ public class StatisticProvider {
         return instance;
     }
 
-    public void setStrategy(StatisticHandlerStrategy<? extends StatisticEvent> strategy) {
+    public void init(Context context) {
+        init(context, new TDStaticHandlerStrategy(), TDStatisticEvent.class);
+    }
+
+    public void init(Context context, StatisticHandlerStrategy<? extends StatisticEvent> strategy, Class<? extends StatisticEvent> eventClass) {
+        mContext = context.getApplicationContext();
         this.strategy = strategy;
+        this.eventClass = eventClass;
     }
 
     public StatisticHandlerStrategy<StatisticEvent> getStrategy() {
+        checkNull(strategy);
         return (StatisticHandlerStrategy<StatisticEvent>) strategy;
     }
+
+    public Class<? extends StatisticEvent> getEventClass() {
+        checkNull(eventClass);
+        return eventClass;
+    }
+
+    public Context getContext() {
+        checkNull(mContext);
+        return mContext;
+    }
+
+    private void checkNull(Object object) {
+        if (object == null) {
+            throw new IllegalStateException("call init() before use");
+        }
+    }
+
 }
