@@ -7,10 +7,10 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.1'
-        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7'
+//        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7'
         classpath 'org.aspectj:aspectjtools:1.8.9'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -29,6 +29,26 @@ allprojects {
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
+    }
+    ext{
+        bintrayRepo = 'Xcstasy'
+        bintrayName = 'reaper'
+
+        publishedGroupId = group
+
+
+        libraryDescription = 'A gradle plugin for AspectJ'
+
+        siteUrl = 'https://github.com/DrcZeaRot/Reaper'
+        gitUrl = 'https://github.com/DrcZeaRot/Reaper.git'
+
+        developerId = 'DrcZeaRot'
+        developerName = 'DrcZeaRot'
+        developerEmail = 'drczearot@gmail.com'
+
+        licenseName = 'The Apache Software License, Version 2.0'
+        licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+        allLicenses = ["Apache-2.0"]
     }
 }
 

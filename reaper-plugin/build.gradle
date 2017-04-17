@@ -1,13 +1,9 @@
 apply plugin: 'groovy'
-apply plugin: 'nexus'
+//apply plugin: 'nexus'
 
 
 targetCompatibility = JavaVersion.VERSION_1_7
 sourceCompatibility = JavaVersion.VERSION_1_7
-
-repositories {
-    mavenCentral()
-}
 
 dependencies {
     compile gradleApi()
@@ -16,3 +12,14 @@ dependencies {
     compile 'org.aspectj:aspectjtools:1.8.9'
     compile 'org.aspectj:aspectjrt:1.8.9'
 }
+
+ext {
+    libraryName = 'Reaper Plugin'
+    artifact = 'reaper-plugin'
+    libraryVersion = version
+}
+
+apply from: '../mavenInstall.gradle'
+apply from: '../mavenBintrayUpdate.gradle'
+
+

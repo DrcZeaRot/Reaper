@@ -1,5 +1,5 @@
 apply plugin: 'java'
-apply plugin: 'nexus'
+//apply plugin: 'nexus'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
